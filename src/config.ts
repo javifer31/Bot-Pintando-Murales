@@ -15,8 +15,8 @@ function required(name: string): string {
 
 export const config = {
   port: Number(process.env.PORT ?? 3000),
-  anthropicApiKey: required("ANTHROPIC_API_KEY"),
-  anthropicModel: process.env.ANTHROPIC_MODEL ?? "claude-sonnet-5",
+  openrouterApiKey: required("OPENROUTER_API_KEY"),
+  openrouterModel: process.env.OPENROUTER_MODEL ?? "anthropic/claude-haiku-4.5",
   whatsappToken: required("WHATSAPP_TOKEN"),
   whatsappPhoneNumberId: required("WHATSAPP_PHONE_NUMBER_ID"),
   whatsappVerifyToken: required("WHATSAPP_VERIFY_TOKEN"),
