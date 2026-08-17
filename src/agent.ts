@@ -117,6 +117,7 @@ async function callOpenRouter(messages: OpenRouterMessage[]): Promise<{
 
   if (!res.ok) {
     const errText = await res.text();
+    console.error(`[openrouter] Error ${res.status} con modelo "${config.openrouterModel}": ${errText}`);
     throw new Error(`OpenRouter respondio ${res.status}: ${errText}`);
   }
 
@@ -124,6 +125,9 @@ async function callOpenRouter(messages: OpenRouterMessage[]): Promise<{
     choices: { message: OpenRouterMessage; finish_reason: string }[];
   };
   const choice = data.choices[0];
+  console.log(
+    `[openrouter] finish_reason=${choice.finish_reason} tool_calls=${choice.message.tool_calls?.length ?? 0} content="${(choice.message.content ?? "").slice(0, 200)}"`
+  );
   return { message: choice.message, finishReason: choice.finish_reason };
 }
 

@@ -22,6 +22,8 @@ app.get("/webhook", (req: Request, res: Response) => {
   const token = req.query["hub.verify_token"];
   const challenge = req.query["hub.challenge"];
 
+  console.log(`[webhook] GET verificacion: mode=${mode} tokenMatch=${token === config.whatsappVerifyToken}`);
+
   if (mode === "subscribe" && token === config.whatsappVerifyToken) {
     res.status(200).send(challenge);
   } else {
@@ -31,6 +33,8 @@ app.get("/webhook", (req: Request, res: Response) => {
 
 // Recepcion de mensajes entrantes.
 app.post("/webhook", (req: Request & { rawBody?: Buffer }, res: Response) => {
+  console.log("[webhook] POST recibido:", JSON.stringify(req.body));
+
   const signature = req.header("x-hub-signature-256") ?? undefined;
   if (!verifySignature(req.rawBody ?? Buffer.from(""), signature)) {
     console.warn("[webhook] Firma invalida, se descarta la peticion");
@@ -41,7 +45,12 @@ app.post("/webhook", (req: Request & { rawBody?: Buffer }, res: Response) => {
   res.sendStatus(200);
 
   const message = extractIncomingMessage(req.body);
-  if (!message) return;
+  if (!message) {
+    console.log("[webhook] No se pudo extraer un mensaje del payload (probablemente un evento de estado, no un mensaje)");
+    return;
+  }
+
+  console.log(`[webhook] Mensaje extraido: from=${message.from} type=${message.type}`);
 
   markAsRead(message.id).catch(() => {});
 
@@ -50,9 +59,12 @@ app.post("/webhook", (req: Request & { rawBody?: Buffer }, res: Response) => {
     return;
   }
 
-  handleIncomingMessage(message.from, message.text.body).catch((err) => {
-    console.error(`[agent] Error procesando mensaje de ${message.from}:`, err);
-  });
+  console.log(`[agent] Procesando mensaje de ${message.from}: "${message.text.body}"`);
+  handleIncomingMessage(message.from, message.text.body)
+    .then(() => console.log(`[agent] Respuesta enviada a ${message.from}`))
+    .catch((err) => {
+      console.error(`[agent] Error procesando mensaje de ${message.from}:`, err);
+    });
 });
 
 app.listen(config.port, () => {
