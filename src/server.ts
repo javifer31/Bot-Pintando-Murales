@@ -2,6 +2,7 @@ import express, { type Request, type Response } from "express";
 import { config } from "./config";
 import { extractIncomingMessage, markAsRead, verifySignature } from "./whatsapp";
 import { handleIncomingMessage } from "./agent";
+import { renderPrivacyPolicy } from "./privacy";
 
 const app = express();
 
@@ -15,6 +16,11 @@ app.use(
 );
 
 app.get("/health", (_req, res) => res.json({ ok: true }));
+
+// Politica de privacidad publica (requisito de Meta para publicar la aplicacion).
+app.get("/privacy", (_req, res) => {
+  res.type("html").send(renderPrivacyPolicy());
+});
 
 // Verificacion del webhook (handshake que exige Meta al configurar la URL).
 app.get("/webhook", (req: Request, res: Response) => {
