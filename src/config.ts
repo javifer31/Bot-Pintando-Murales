@@ -16,7 +16,7 @@ function required(name: string): string {
 export const config = {
   port: Number(process.env.PORT ?? 3000),
   openrouterApiKey: required("OPENROUTER_API_KEY"),
-  openrouterModel: process.env.OPENROUTER_MODEL ?? "meta-llama/llama-3.3-70b-instruct:free",
+  openrouterModel: process.env.OPENROUTER_MODEL ?? "meta-llama/llama-3.3-70b-instruct",
   whatsappToken: required("WHATSAPP_TOKEN"),
   whatsappPhoneNumberId: required("WHATSAPP_PHONE_NUMBER_ID"),
   whatsappVerifyToken: required("WHATSAPP_VERIFY_TOKEN"),
